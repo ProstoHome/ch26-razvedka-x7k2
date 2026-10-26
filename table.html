@@ -17,6 +17,12 @@ tr:hover td{background:#1c1c1c}
 .cost{font-weight:800;color:#7dff9b;white-space:nowrap}.mut{color:#999;font-size:12px}
 td a{color:#7ab0ff}.small{font-size:12px;color:#bbb}
 .c{max-width:260px}
+@media(max-width:700px){table,tbody,tr,td{display:block;min-width:0!important;width:auto}thead{display:none}.wrap{max-height:none;overflow:visible}
+tr{background:#1a1a1a;margin:10px;border-radius:12px;padding:10px;border:1px solid #2c2c2c}
+td,td:first-child{position:static;max-width:none;border:0;padding:3px 0;background:none!important;min-width:0}
+td:first-child{font-size:16px;padding-bottom:6px}td.c{max-width:none}
+td:nth-child(n+3):before{content:attr(data-l)": ";color:#ffd23f;font-size:11px;font-weight:700}
+td:nth-child(2){display:inline-block}td:nth-child(7){font-size:18px}td:empty{display:none}}
 </style></head><body>
 <header><div class="r1"><a class="back" href="./">← На сайт</a><input class="s" id="q" placeholder="Поиск: товар, поставщик, зал…">
 <select id="f"><option value="">Все выставки</option><option>Canton</option><option>CIFF</option></select><select id="c"><option value="">Все категории</option></select>
@@ -33,10 +39,10 @@ function draw(){const q=$('q').value.toLowerCase(),f=$('f').value,c=$('c').value
 let L=D.filter(x=>(!f||x.fair==f)&&(!c||x.cat==c)&&(!q||JSON.stringify(x).toLowerCase().includes(q)));
 if(sk)L.sort((a,b)=>{let u=sk=='cost'?cost(a):a[sk],v=sk=='cost'?cost(b):b[sk];if(u==null)return 1;if(v==null)return -1;return (u>v?1:u<v?-1:0)*sd});
 $('cnt').textContent='Показано: '+L.length+' из '+D.length+'. Себестоимость = цена × курс'+' (+ доставка, если известен вес). Нажмите на заголовок для сортировки.';
-$('b').innerHTML=L.map(x=>{const k=cost(x);const nm=x.name.startsWith('уточнить')?'Название уточняется':x.name;
+$('b').innerHTML=(L=>L)(L).map(x=>{const k=cost(x);const nm=x.name.startsWith('уточнить')?'Название уточняется':x.name;
 let s=x.site?'<a target=_blank href="'+(x.site.startsWith('http')?x.site:'https://'+x.site)+'">сайт</a>':'';
 let v=(x.vids||[]).map((u,i)=>'<a target=_blank href="'+u+'">▶'+(i+1)+'</a>').join(' ');
-return '<tr><td><b>'+e(nm)+'</b></td><td><span class="p '+x.fair+'">'+x.fair+'</span></td><td>'+e(x.cat)+'</td><td>'+e(x.stand)+'</td><td class="c">'+e(x.prod)+'</td><td>'+(x.usd?'$'+x.usd+' <span class=mut>/'+e(x.unit)+'</span>':'—')+'</td><td class="cost">'+(k?k.toLocaleString('ru')+' ₽':'—')+'</td><td class="c small">'+e(x.price)+'</td><td class="c small">'+e(x.contacts)+'</td><td>'+s+'</td><td>'+v+'</td></tr>'}).join('')}
+const Lb=['', '', 'Категория', 'Зал / стенд', 'Товары', 'Цена', 'Себестоимость', 'Условия', 'Контакты', 'Сайт', 'Видео'];return '<tr><td><b>'+e(nm)+'</b></td><td><span class="p '+x.fair+'">'+x.fair+'</span></td><td>'+e(x.cat)+'</td><td>'+e(x.stand)+'</td><td class="c">'+e(x.prod)+'</td><td>'+(x.usd?'$'+x.usd+' <span class=mut>/'+e(x.unit)+'</span>':'—')+'</td><td class="cost">'+(k?k.toLocaleString('ru')+' ₽':'—')+'</td><td class="c small">'+e(x.price)+'</td><td class="c small">'+e(x.contacts)+'</td><td>'+s+'</td><td>'+v+'</td></tr>'}).join('');document.querySelectorAll('#b tr').forEach(r=>r.querySelectorAll('td').forEach((t,i)=>{t.dataset.l=['','','Категория','Зал / стенд','Товары','Цена','Себестоимость','Условия','Контакты','Сайт','Видео'][i];if(i>=9&&!t.textContent.trim())t.style.display='none'}))}
 ['q','f','c','rate','ship'].forEach(i=>$(i).addEventListener('input',draw));
 document.querySelectorAll('th[data-k]').forEach(t=>t.onclick=()=>{const k=t.dataset.k;sd=sk==k?-sd:1;sk=k;draw()});
 draw();
